@@ -135,6 +135,10 @@ extern struct CreditsEntry *gCurrCreditsEntry;
 extern struct MarioState gMarioStates[];
 extern struct MarioState *gMarioState;
 
+enum CoinRushState { COIN_RUSH_OFF, COIN_RUSH_ACTIVE, COIN_RUSH_WON, COIN_RUSH_LOST };
+extern s16 gCoinRushTimer;
+extern s8 gCoinRushState;
+
 extern s16 sCurrPlayMode;
 extern u16 D_80339ECA;
 extern s16 sTransitionTimer;

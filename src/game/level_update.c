@@ -959,6 +959,38 @@ void basic_update(UNUSED s16 *arg) {
     }
 }
 
+// ---- Coin Rush: collect COIN_RUSH_GOAL coins within COIN_RUSH_TIME frames for a 1-up ----
+#define COIN_RUSH_GOAL 20
+#define COIN_RUSH_TIME (60 * 30)
+
+s16 gCoinRushTimer = 0;
+s8 gCoinRushState = COIN_RUSH_OFF;
+
+static void coin_rush_reset(void) {
+    if (gCurrCourseNum >= COURSE_MIN && gCurrCourseNum <= COURSE_STAGES_MAX && gCurrDemoInput == NULL
+        && gCurrCreditsEntry == NULL) {
+        gCoinRushState = COIN_RUSH_ACTIVE;
+        gCoinRushTimer = COIN_RUSH_TIME;
+    } else {
+        gCoinRushState = COIN_RUSH_OFF;
+        gCoinRushTimer = 0;
+    }
+}
+
+static void coin_rush_update(void) {
+    if (gCoinRushState != COIN_RUSH_ACTIVE) {
+        return;
+    }
+    if (gMarioState->numCoins >= COIN_RUSH_GOAL) {
+        gMarioState->numLives++;
+        play_sound(SOUND_GENERAL_COLLECT_1UP, gGlobalSoundSource);
+        gCoinRushState = COIN_RUSH_WON;
+    } else if (--gCoinRushTimer <= 0) {
+        gCoinRushTimer = 0;
+        gCoinRushState = COIN_RUSH_LOST;
+    }
+}
+
 s32 play_mode_normal(void) {
     if (gCurrDemoInput != NULL) {
         print_intro_text();
@@ -979,6 +1011,7 @@ s32 play_mode_normal(void) {
     }
 
     area_update_objects();
+    coin_rush_update();
     update_hud_values();
 
     if (gCurrentArea != NULL) {
@@ -1162,6 +1195,7 @@ s32 init_level(void) {
     D_80339EE0 = 0;
     gHudDisplay.flags = gCurrCreditsEntry == NULL ? HUD_DISPLAY_DEFAULT : HUD_DISPLAY_NONE;
     sTimerRunning = FALSE;
+    coin_rush_reset();
 
     if (sWarpDest.type != WARP_TYPE_NOT_WARPING) {
         if (sWarpDest.nodeId >= WARP_NODE_CREDITS_MIN) {

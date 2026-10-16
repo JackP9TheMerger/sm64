@@ -408,6 +408,21 @@ void render_hud_camera_status(void) {
  * Render HUD strings using hudDisplayFlags with it's render functions,
  * excluding the cannon reticle which detects a camera preset for it.
  */
+void render_hud_coin_rush(void) {
+    switch (gCoinRushState) {
+        case COIN_RUSH_ACTIVE:
+            print_text(20, 40, "RUSH");
+            print_text_fmt_int(80, 40, "%d", (gCoinRushTimer + 29) / 30);
+            break;
+        case COIN_RUSH_WON:
+            print_text(20, 40, "RUSH WIN");
+            break;
+        case COIN_RUSH_LOST:
+            print_text(20, 40, "RUSH LOST");
+            break;
+    }
+}
+
 void render_hud(void) {
     s16 hudDisplayFlags = gHudDisplay.flags;
 
@@ -440,6 +455,8 @@ void render_hud(void) {
         if (hudDisplayFlags & HUD_DISPLAY_FLAG_LIVES) {
             render_hud_mario_lives();
         }
+
+        render_hud_coin_rush();
 
         if (hudDisplayFlags & HUD_DISPLAY_FLAG_COIN_COUNT) {
             render_hud_coins();
